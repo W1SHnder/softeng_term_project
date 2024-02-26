@@ -15,3 +15,17 @@ ReactDOM.render(
     <HelloWorld />,
     document.getElementById('root')
 );
+
+function fetchMovies() {
+    return fetch('/api/movies')
+	.then(response => response.json());
+}
+
+/*
+export class MovieList extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = { movies: [] };
+    }
+}
+*/

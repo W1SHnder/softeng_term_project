@@ -7,7 +7,7 @@ app = Flask(__name__)
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Lucygirl321',
+    'password': 'password',
     'database': 'MovieDB'
 }
 
@@ -30,7 +30,9 @@ def get_movies_by_title():
         movies = execute_query(query, (f'%{title}%',))
         return jsonify(movies)
     else:
-        return jsonify({'error': 'Title parameter is required.'}), 400
+        query = "SELECT * FROM Movie"
+        movies = execute_query(query)
+        return jsonify(movies)
 
 
 
