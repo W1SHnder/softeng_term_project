@@ -1,30 +1,16 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from 'react-router-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route,  } from 'react-router-dom';
 import Home from './components/Home';
 
-
-/*
 ReactDOM.render(
-    <Routes>
-      <Route path="/" exact component={Home} />
-    </Routes>
+    <Router>
+        <Switch>
+            <Route path="/" exact component={Home} />
+        </Switch>
+    </Router>,
   document.getElementById('root')
 );
-*/
 
-const router = createBrowserRouter([
-    {
-	path: '/',
-	element: <Home />,
-    },
-]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-	<React.StrictMode>
-	    <RouterProvider router={router}/>
-	</React.StrictMode>
-);
+

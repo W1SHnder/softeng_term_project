@@ -77,10 +77,4 @@ const Home = () => {
 }
 	
 
-/*
-<div class="movie">
-    <a href="marley.html"><img src={}></a>
-    <a href="marley.html" class="tickets" id="marley">GET TICKETS</a>
-</div>
-*/
 export default Home;
