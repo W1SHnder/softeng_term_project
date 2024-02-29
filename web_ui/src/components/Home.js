@@ -2,33 +2,42 @@ import React from 'react';
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
 
+import './styles/Home.css';
+
+/*
+import './assets/images/mpaa_G.png';
+import './assets/images/mpaa_PG.png';
+import './assets/images/mpaa_PG-13.png';
+import './assets/images/mpaa_R.png';
+import './assets/images/mpaa_NC-17.png';
+*/
+
 const Movie = ({ title, rating, mpaaRating, imageUrl, onClick }) => {
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <img src={imageUrl} alt={title} style={{ width: '200px', height: '300px', cursor: 'pointer' }} onClick={onClick} />
-      <div style={{ marginTop: '10px' }}>
-        <img src={`mpaa-${mpaaRating}.png`} alt={mpaaRating} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
-        <div style={{ display: 'inline-block', verticalAlign: 'top' }}>
-          <h3>{title}</h3>
-        </div>
+    <div className="movie">
+      <img src={imageUrl} alt={title} className="movie-image" onClick={onClick} />
+      <div className="movie-details">
+        <img src={`mpaa-${mpaaRating}.png`} alt={mpaaRating} className="mpaa-rating" />
+          <h3 className="movie-title">{title}</h3>
       </div>
     </div>
   );
 };
 
-const Home = () => {
+const GridView = ({ endpoint }) => {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
     // Fetch movie data from the API endpoint
-    fetch('http://localhost:5000/ComingSoon')
+    console.log(`Fetching movies from ${endpoint}`);
+    fetch(`http://localhost:5000/${endpoint}`)
       .then(response => response.json())
       .then(data => setMovies(data))
       .catch(error => console.error('Error fetching movies:', error));
   }, []);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gridGap: '20px' }}>
+    <div className="movie-grid">
       {movies.map(movie => (
         <Movie
           key={movie.id}
@@ -37,9 +46,39 @@ const Home = () => {
           imageUrl={movie.trailer_picture}
           onClick={() => console.log(`Clicked on ${movie.title}`)} // Example click handler
         />
-      ))}
+     ))}
     </div>
   );
 };
 
+const Home = () => {
+    const [endpoint, setEndpoint] = useState('NowShowing');
+    const [searchTerm, setSearchTerm] = useState('');
+  
+    const handleSearch = (search_term) => {
+	console.log(`Search for ${search_term}`);
+    };
+    
+    return (
+	<div className="home">
+	    <div className="home-navbar">
+	        <button className={endpoint === 'NowShowing' ? 'active' : ''} onClick={() => setEndpoint('NowShowing')}>Now Playing</button>
+                <button className={endpoint === 'ComingSoon' ? 'active' : ''} onClick={() => setEndpoint('ComingSoon')}>Coming Soon</button>
+                <div className="search-bar">
+          	    <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+	            <button onClick={ () => handleSearch(searchTerm)}>Search</button>
+                </div>
+	    </div>
+	    <GridView endpoint={endpoint} />
+	</div>
+    );
+}
+	
+
+/*
+<div class="movie">
+    <a href="marley.html"><img src={}></a>
+    <a href="marley.html" class="tickets" id="marley">GET TICKETS</a>
+</div>
+*/
 export default Home;

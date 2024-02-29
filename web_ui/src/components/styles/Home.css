@@ -1,0 +1,95 @@
+/* Style for movie grid */
+.movie-grid {
+  padding-top: 60px; /* Add padding to the top of the movie grid */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 20px;
+}
+
+/* Style for movie */
+.movie {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+/* Style for movie image */
+.movie-image {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+/* Style for movie details */
+.movie-details {
+  padding: 10px;
+}
+
+/* Style for MPAA rating image */
+.mpaa-rating {
+  width: 50px;
+  height: auto;
+}
+
+/* Style for movie title */
+.movie-title {
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+/* Style for home page navbar */
+.home-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #333;
+  padding: 10px;
+}
+
+/* Style for Now Showing and Coming Soon buttons */
+.home-navbar button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* Style for active button */
+.home-navbar button.active {
+  background-color: #fff;
+  color: #333;
+}
+
+/* Style for search bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+/* Style for search input */
+.search-bar input[type="text"] {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+/* Style for search button */
+.search-bar button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
