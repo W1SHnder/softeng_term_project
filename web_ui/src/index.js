@@ -1,31 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import {
+    createBrowserRouter,
+    RouterProvider,
+} from 'react-router-dom';
+import Home from './components/Home';
 
-export class HelloWorld extends React.Component {
-    render() {
-	return (
-	    <div>
-		<h1>Hello, World!</h1>
-	    </div>
-	);
-    }
-}
-
-ReactDOM.render(
-    <HelloWorld />,
-    document.getElementById('root')
-);
-
-function fetchMovies() {
-    return fetch('/api/movies')
-	.then(response => response.json());
-}
 
 /*
-export class MovieList extends React.Component {
-    constructor(props) {
-	super(props);
-	this.state = { movies: [] };
-    }
-}
+ReactDOM.render(
+    <Routes>
+      <Route path="/" exact component={Home} />
+    </Routes>
+  document.getElementById('root')
+);
 */
+
+const router = createBrowserRouter([
+    {
+	path: '/',
+	element: <Home />,
+    },
+]);
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+	<React.StrictMode>
+	    <RouterProvider router={router}/>
+	</React.StrictMode>
+);
