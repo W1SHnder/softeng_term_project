@@ -1,46 +1,41 @@
-/* Style for movie grid */
 .movie-grid {
-  padding-top: 60px; /* Add padding to the top of the movie grid */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  grid-gap: 20px;
+  padding-top: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px; /* Add gap between movies */
 }
 
 /* Style for movie */
 .movie {
+  width: calc(10% - 10px); /* Adjust width to fit 10 movies in a row with gap */
   border: 1px solid #ccc;
   border-radius: 5px;
   overflow: hidden;
-  width: 150px;
-  margin-bottom: 20px;
 }
 
-/* Style for movie image */
+/* Rest of the CSS styles remain unchanged */
 .movie-image {
   width: 100%;
   height: auto;
   cursor: pointer;
 }
 
-/* Style for movie details */
 .movie-details {
-  padding: 10px;
+  padding: 5px;
 }
 
-/* Style for MPAA rating image */
 .mpaa-rating {
-  width: 50px;
+  width: 30px; /* Reduce MPAA rating image size */
   height: auto;
 }
 
-/* Style for movie title */
 .movie-title {
   margin-top: 5px;
-  font-size: 0.9em;
+  font-size: 1.0em; /* Decrease font size */
   color: #333;
 }
 
-/* Style for home page navbar */
 .home-navbar {
   position: fixed;
   top: 0;
@@ -53,9 +48,8 @@
   padding: 10px;
 }
 
-/* Style for Now Showing and Coming Soon buttons */
 .home-navbar button {
-  padding: 10px 20px;
+  padding: 8px 15px; /* Reduce button padding */
   border: none;
   border-radius: 5px;
   background-color: transparent;
@@ -64,29 +58,25 @@
   margin-right: 10px;
 }
 
-/* Style for active button */
 .home-navbar button.active {
   background-color: #fff;
   color: #333;
 }
 
-/* Style for search bar */
 .search-bar {
   display: flex;
   align-items: center;
 }
 
-/* Style for search input */
 .search-bar input[type="text"] {
-  padding: 8px;
+  padding: 5px; /* Reduce input padding */
   border-radius: 5px;
   border: 1px solid #ccc;
-  margin-right: 10px;
+  margin-right: 5px; /* Adjust margin */
 }
 
-/* Style for search button */
 .search-bar button {
-  padding: 8px 15px;
+  padding: 8px 12px; /* Reduce button padding */
   border: none;
   border-radius: 5px;
   background-color: #007bff;

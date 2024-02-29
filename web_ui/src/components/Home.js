@@ -17,7 +17,7 @@ const Movie = ({ title, rating, mpaaRating, imageUrl, onClick }) => {
     <div className="movie">
       <img src={imageUrl} alt={title} className="movie-image" onClick={onClick} />
       <div className="movie-details">
-        <img src={`mpaa-${mpaaRating}.png`} alt={mpaaRating} className="mpaa-rating" />
+     	  <h3>{mpaaRating}</h3>
           <h3 className="movie-title">{title}</h3>
       </div>
     </div>
@@ -34,7 +34,7 @@ const GridView = ({ endpoint }) => {
       .then(response => response.json())
       .then(data => setMovies(data))
       .catch(error => console.error('Error fetching movies:', error));
-  }, []);
+  }, [endpoint]);
 
   return (
     <div className="movie-grid">
@@ -57,8 +57,10 @@ const Home = () => {
   
     const handleSearch = (search_term) => {
 	console.log(`Search for ${search_term}`);
+	setEndpoint(`movies?title=${encodeURIComponent(search_term)}`);
+	
     };
-    
+    console.log("Home component re-rendered. Endpoint:", endpoint); 
     return (
 	<div className="home">
 	    <div className="home-navbar">
