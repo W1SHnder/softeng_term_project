@@ -1,0 +1,85 @@
+.movie-grid {
+  padding-top: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px; /* Add gap between movies */
+}
+
+/* Style for movie */
+.movie {
+  width: calc(10% - 10px); /* Adjust width to fit 10 movies in a row with gap */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+/* Rest of the CSS styles remain unchanged */
+.movie-image {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.movie-details {
+  padding: 5px;
+}
+
+.mpaa-rating {
+  width: 30px; /* Reduce MPAA rating image size */
+  height: auto;
+}
+
+.movie-title {
+  margin-top: 5px;
+  font-size: 1.0em; /* Decrease font size */
+  color: #333;
+}
+
+.home-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #333;
+  padding: 10px;
+}
+
+.home-navbar button {
+  padding: 8px 15px; /* Reduce button padding */
+  border: none;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.home-navbar button.active {
+  background-color: #fff;
+  color: #333;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input[type="text"] {
+  padding: 5px; /* Reduce input padding */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 5px; /* Adjust margin */
+}
+
+.search-bar button {
+  padding: 8px 12px; /* Reduce button padding */
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
