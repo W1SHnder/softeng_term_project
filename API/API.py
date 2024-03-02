@@ -13,7 +13,7 @@ def connect_to_database():
             host='127.0.0.1',
             database='MovieDB',
             user='root',
-            password='Lucygirl321'
+            password='temp1234'
         )
         if connection.is_connected():
             print('Connected to MySQL database')
