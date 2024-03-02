@@ -37,7 +37,7 @@ const GridView = ({ endpoint }) => {
   }, [endpoint]);
 
   return (
-    <div className="movie-grid">
+   <div className="movie-grid">
       {movies.map(movie => (
         <Movie
           key={movie.id}
