@@ -1,0 +1,35 @@
+body {
+    font-family: "Raleway", sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 1%;
+    height: 100vh;
+}
+
+
+input {
+    border-radius: 5px;
+    border-color: black;
+    margin-bottom: 1%;
+    width:15%;
+}
+
+button {
+    border-radius: 5px;
+    border-color: black;
+    background-color: #ec1212;
+}
+
+li button {
+    margin-left: 1%;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style-type: none;
+    margin-bottom: 1%;
+}
