@@ -1,11 +1,25 @@
 from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from datetime import datetime
+from flask_slqalchemy import SQLAlchemy
 from mysql.connector import Error
 import mysql.connector
 
+
 app = Flask(__name__)
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:temp1234@localhost/MovieDB'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'temp'
+
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
+
+
+
 
 def connect_to_database():
     try:
