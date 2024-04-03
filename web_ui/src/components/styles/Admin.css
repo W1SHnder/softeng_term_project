@@ -6,12 +6,11 @@ body {
     height: 100vh;
 }
 
-
 input {
     border-radius: 5px;
     border-color: black;
     margin-bottom: 1%;
-    width:15%;
+    width: 15%;
 }
 
 button {
@@ -32,4 +31,28 @@ ul {
 li {
     list-style-type: none;
     margin-bottom: 1%;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    display: inline-block;
+    margin-right: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
+li.active {
+    font-weight: bold;
 }

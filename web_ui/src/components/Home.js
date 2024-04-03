@@ -69,6 +69,7 @@ const Home = () => {
                 <div className="search-bar">
           	    <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 	            <button onClick={ () => handleSearch(searchTerm)}>Search</button>
+              <p><Link to='/login'>Login</Link></p>
                 </div>
 	    </div>
 	    <GridView endpoint={endpoint} />
