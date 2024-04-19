@@ -29,6 +29,10 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        return self._create_user(email, password, **extra_fields)
 
     def create_staff(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -41,6 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    phone = models.CharField(_('phone number'), max_length=16, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
@@ -169,8 +174,12 @@ class Transaction(models.Model):
         db_table = 'Transaction'
 
 
-
-
+class RegistrationCode(models.Model):
+    email = models.CharField(max_length=64)
+    code = models.CharField(max_length=8)
+    
+    class Meta:
+        db_table = 'RegistrationCodes'
 
 
 

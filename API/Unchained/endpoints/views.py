@@ -10,7 +10,7 @@ from endpoints.models import *
 from endpoints.serializers import *
 from django.conf import settings
 from django.core.mail import send_mail
-
+from django.contrib.auth import get_user_model
 # Create your views here. 
         
 
@@ -86,10 +86,29 @@ def reg_veri(request, email):
         message = f'Your registration code is {reg_code}'
         try:
             send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+            reg_code_obj = RegistrationCode(email=email, code=reg_code)
+            reg_code_obj.save()
+            return Response({'message': 'Registration code sent'}, status=200)
         except Exception as e:
-            return Response({'message': 'Failed to send email', 'error': str(e)}, status=500)
-        return Response({'message': 'Registration code sent'}, status=200)
+            return Response({'message': 'Failed to send email', 'error': str(e)}, status=500) 
     else:
         return Response({'message': 'Email is required'}, status=400)
 
 
+@api_view(['POST'])
+def register_user(request):
+    user_class = get_user_model()
+    fname = request.data.get('first_name')
+    lname = request.data.get('last_name')
+    phone = request.data.get('phone')
+    email = request.data.get('email')
+    pword = request.data.get('password')
+    reg_code = request.data.get('code')
+
+    if fname and lname and phone and email and pword and reg_code:
+        real_code = RegistrationCode.objects.filter(email=email, code=reg_code)
+        if not real_code.exists():
+            return Response({'message': 'Invalid registration code'}, status=400)
+        real_code.delete()
+        new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
+        new_user.save()
