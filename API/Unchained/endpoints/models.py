@@ -4,10 +4,62 @@
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 # Feel free to rename the models, but don't rename db_table values or field names.
+
+from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
+from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.base_user import BaseUserManager
+from django.conf import settings
 
+class UserManager(BaseUserManager):
+    user_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        if not password:
+            raise ValueError('The Password field must be set')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_staff(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        return self._create_user(email, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(_('email address'), unique=True)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+    is_active = models.BooleanField(_('active'), default=True)
+    is_staff = models.BooleanField(_('staff'), default=False)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+
+    def get_full_name(self):
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        return self.first_name
 
 
 class BillingAddress(models.Model):
@@ -21,8 +73,9 @@ class BillingAddress(models.Model):
         db_table = 'BillingAddress'
 
 
+
 class Booking(models.Model):
-    user = models.ForeignKey('auth.User', models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
     showtime = models.ForeignKey('Showtime', models.DO_NOTHING)
     transaction = models.ForeignKey('Transaction', models.DO_NOTHING, blank=True, null=True)
 
@@ -47,7 +100,7 @@ class Movie(models.Model):
 
 
 class Reveiw(models.Model):
-    user = models.ForeignKey('auth.User', models.DO_NOTHING) #May need to add cascade on delete??
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING) #May need to add cascade on delete??
     movie = models.ForeignKey(Movie, models.DO_NOTHING)
     rating = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
     review = models.TextField(blank=True, null=True)
@@ -57,7 +110,7 @@ class Reveiw(models.Model):
 
 
 class PaymentCard(models.Model):
-    user = models.ForeignKey('auth.User', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING, blank=True, null=True)
     card_number = models.CharField(max_length=256, blank=True, null=True)
     billing_addr = models.ForeignKey(BillingAddress, models.DO_NOTHING, db_column='billing_addr', blank=True, null=True)
 
@@ -114,5 +167,11 @@ class Transaction(models.Model):
 
     class Meta:
         db_table = 'Transaction'
+
+
+
+
+
+
 
 

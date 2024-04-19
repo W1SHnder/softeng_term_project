@@ -58,6 +58,7 @@ urlpatterns = [
     path('Showtime/<int:pk>/', showtime_detail, name='showtime-detail'),
     path('Showroom/', showroom_list, name='showroom-list'),
     path('Showroom/<int:pk>/', showroom_detail, name='showroom-detail'),
+    path('Verify/<str:email>', views.reg_veri),
 ]
  
 

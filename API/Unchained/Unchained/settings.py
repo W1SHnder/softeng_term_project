@@ -87,6 +87,8 @@ DATABASES = {
 }
 
 
+AUTH_USER_MODEL = 'endpoints.User'
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -136,3 +138,17 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],
 }
+
+
+#Email settings
+#Consider using django backend over yagmail
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'defnotphishing99@gmail.com'
+EMAIL_HOST_PASSWORD = 'qihcawhpzqmqdizp'
+
+
+

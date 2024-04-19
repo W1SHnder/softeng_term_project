@@ -1,3 +1,5 @@
+import random
+
 from rest_framework import generics, renderers, viewsets
 from datetime import datetime, timedelta
 from django.shortcuts import render
@@ -6,9 +8,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from endpoints.models import *
 from endpoints.serializers import *
+from django.conf import settings
+from django.core.mail import send_mail
 
-# Create your views here.
- 
+# Create your views here. 
         
 
 class MovieViewSet(viewsets.ModelViewSet):
@@ -73,5 +76,20 @@ def coming_soon(request):
         return Response(serializer.data)
     else:
         return Response({'message': 'No movies found'}, status=404)
+
+
+@api_view(['GET'])
+def reg_veri(request, email): 
+    if email:
+        reg_code = random.randint(100000, 999999)
+        subject = 'Registration Verification'
+        message = f'Your registration code is {reg_code}'
+        try:
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+        except Exception as e:
+            return Response({'message': 'Failed to send email', 'error': str(e)}, status=500)
+        return Response({'message': 'Registration code sent'}, status=200)
+    else:
+        return Response({'message': 'Email is required'}, status=400)
 
 
