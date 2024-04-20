@@ -41,6 +41,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -182,5 +183,14 @@ class RegistrationCode(models.Model):
         db_table = 'RegistrationCodes'
 
 
+class ShippingAddress(models.Model):
+    address1 = models.TextField(blank=True, null=True)
+    address2 = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    zipcode = models.CharField(max_length=32, blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, models.CASCADE)
 
+    class Meta:
+        db_table = 'ShippingAddress'
 

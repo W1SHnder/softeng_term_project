@@ -11,6 +11,8 @@ from endpoints.serializers import *
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login
+
 # Create your views here. 
         
 
@@ -112,3 +114,22 @@ def register_user(request):
         real_code.delete()
         new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
         new_user.save()
+        return Response({'message': 'User registered'}, status=201)
+    else:
+        return Response({'message': 'Missing required fields'}, status=400)
+
+
+
+@api_view(['POST'])
+def login_user(request):
+    user_class = get_user_model()
+    email = request.data.get('email')
+    pword = request.data.get('password')
+    long_session = request.data.get('long_session')
+    user = authenticate(request, email=email, password=pword)
+    if not user:
+        return Response({'message': 'Invalid login credentials'}, status=400)
+    login(request, user)
+    if long_session:
+        request.session.set_expiry(30*24*60*60)
+    return Response({'message': 'Login successful'}, status=200)

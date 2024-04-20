@@ -60,6 +60,7 @@ urlpatterns = [
     path('Showroom/<int:pk>/', showroom_detail, name='showroom-detail'),
     path('Verify/<str:email>', views.reg_veri),
     path('Register/', views.register_user),
+    path('Login/', views.login_user),
 ]
  
 
