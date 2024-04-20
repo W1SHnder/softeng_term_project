@@ -1,0 +1,37 @@
+.Register {
+    background: linear-gradient(#2A00B7, #42006C);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color:#3c009d;
+}
+
+.progress-bar {
+    display: flex; /* Use flexbox layout */
+    justify-content: center; /* Center the dots horizontally */
+    margin-bottom: 20px; /* Add some margin for spacing */
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    background-color: #bbb;
+    border-radius: 50%;
+    margin: 0 5px; /* Add margin between dots */
+    cursor: pointer;
+}
+
+.dot.active {
+    background-color: #717171;
+}
+
+select {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: solid 1px #f4f4f4;
+}

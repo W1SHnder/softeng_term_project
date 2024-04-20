@@ -2,6 +2,11 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import Home from "./components/Home";
 import Admin from "./components/Admin"
+<<<<<<< HEAD
+=======
+import Login from "./components/Login"
+import Register from "./components/Register";
+>>>>>>> 8be683f (login, register, admin)
 import {
   createBrowserRouter,
   RouterProvider,
@@ -10,13 +15,27 @@ import {
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Home />,
   },
   {
+<<<<<<< HEAD
     path: "Admin/",
     element: <Admin />,
   },
+=======
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/admin',
+    element: <Admin />,
+  },
+  {
+    path: '/register',
+    element: <Register />,
+  }
+>>>>>>> 8be683f (login, register, admin)
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -24,6 +43,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
-
-
