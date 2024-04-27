@@ -1,6 +1,6 @@
 import random
 
-from rest_framework import generics, renderers, viewsets
+from rest_framework import generics, renderers, viewsets, permissions
 from datetime import datetime, timedelta
 from django.shortcuts import render
 from rest_framework.decorators import api_view, action
@@ -13,10 +13,12 @@ from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
 
+
 # Create your views here. 
         
 
 class MovieViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
@@ -40,6 +42,21 @@ class MovieViewSet(viewsets.ModelViewSet):
         serializer = ShowtimeSerializer(showtimes, many=True, context={'request': request})
         return Response(serializer.data)
 
+    def create(self, request):
+        permission_classes = [permissions.IsAdminUser]
+        showtimes = request.data.pop('showtimes')
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        for showtime in showtimes:
+            showtime['movie'] = serializer.data['id']
+            showtime_serializer = ShowtimeSerializer(data=showtime)
+            if showtime_serializer.is_valid():
+                showtime_serializer.save()
+            return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=400)
+
 
 class ShowtimeViewSet(viewsets.ModelViewSet):
     queryset = Showtime.objects.all()
@@ -51,6 +68,69 @@ class ShowroomViewSet(viewsets.ModelViewSet):
     serializer_class = ShowroomSerializer
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    customUser = get_user_model()
+    queryset = customUser.objects.all()
+    serializer_class = UserSerializer
+    permisson_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(id=self.request.user.id)
+        return queryset
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request):
+        permission_classes = [permissions.IsAuthenticated]
+        queryset = request.user
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data)
+
+    def update(self, request):
+        permission_classes = [permissions.IsAuthenticated]
+        queryset = request.user
+        serializer = self.serializer_class(queryset, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+
+class UserAdminViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = self.get_queryset()
+        user = queryset.get(id=pk)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        queryset = self.get_queryset()
+        user = queryset.get(id=pk)
+        serializer = self.serializer_class(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+    
+
+class BookingViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        return queryset
 
 @api_view(['GET'])
 def now_playing(request):
@@ -106,14 +186,29 @@ def register_user(request):
     email = request.data.get('email')
     pword = request.data.get('password')
     reg_code = request.data.get('code')
+    
+    payment_cards = request.data.get('payment_cards')
+    shipping_addr = request.data.get('shipping_address')
 
     if fname and lname and phone and email and pword and reg_code:
+        # Validate registration code
         real_code = RegistrationCode.objects.filter(email=email, code=reg_code)
         if not real_code.exists():
             return Response({'message': 'Invalid registration code'}, status=400)
         real_code.delete()
+
+        #Create new user instance
         new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
         new_user.save()
+
+        #Add optional user fields [UNTESTED!!!!!!!]
+        if payment_cards:
+            for card in payment_cards:
+                card_obj = PaymentCard(user=new_user, **card)
+                card_obj.save()
+        if shipping_addr:
+            addr_obj = ShippingAddress(user=new_user, **shipping_addr)
+            addr_obj.save()
         return Response({'message': 'User registered'}, status=201)
     else:
         return Response({'message': 'Missing required fields'}, status=400)

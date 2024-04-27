@@ -68,18 +68,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
 
-class BillingAddress(models.Model):
-    address1 = models.TextField(blank=True, null=True)
-    address2 = models.TextField(blank=True, null=True)
-    city = models.CharField(max_length=255, blank=True, null=True)
-    state = models.CharField(max_length=255, blank=True, null=True)
-    zipcode = models.CharField(max_length=32, blank=True, null=True)
-
-    class Meta:
-        db_table = 'BillingAddress'
-
-
-
 class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
     showtime = models.ForeignKey('Showtime', models.DO_NOTHING)
@@ -116,9 +104,14 @@ class Reveiw(models.Model):
 
 
 class PaymentCard(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
+    card_type = models.CharField(max_length=32, blank=True, null=True)
     card_number = models.CharField(max_length=256, blank=True, null=True)
-    billing_addr = models.ForeignKey(BillingAddress, models.DO_NOTHING, db_column='billing_addr', blank=True, null=True)
+    address1 = models.TextField(blank=True, null=True)
+    address2 = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    zipcode = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         db_table = 'PaymentCard'
