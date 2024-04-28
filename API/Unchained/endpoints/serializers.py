@@ -8,7 +8,6 @@ from django.conf import settings
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    #showtimes = ShowtimesHyperlink(view_name='movie-showtimes', read_only=True)
     class Meta:
         model = Movie
         fields = ['id', 'title', 'category', 'director', 'producer', 'cast', 
@@ -31,9 +30,23 @@ class ShowroomSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    
+    #add paymentcard field?
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'phone']
         read_only_fields = ['email']
-    
+ 
+
+class TicketSerializer(serializers.ModelSerializer):
+    showtime = ShowtimeSerializer(read_only=True) 
+    class Meta:
+        model = Ticket
+        fields = ['id', 'type', 'seat_num', 'showtime']
+
+class BookingSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=True)
+    class Meta:
+        model = Booking
+        fields = ['id', 'showtime', 'user', 'tickets']
+        read_only_fields = ['user']
+

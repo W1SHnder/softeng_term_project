@@ -10,8 +10,8 @@ from endpoints.models import *
 from endpoints.serializers import *
 from django.conf import settings
 from django.core.mail import send_mail
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
+
 
 
 # Create your views here. 
@@ -119,8 +119,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-    
-
+   
 class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
     queryset = Booking.objects.all()
@@ -131,6 +130,28 @@ class BookingViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_staff:
             queryset = queryset.filter(user=self.request.user)
         return queryset
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = self.get_queryset()
+        booking = queryset.get(id=pk)
+        serializer = self.serializer_class(booking)
+        return Response(serializer.data)
+
+    def create(self, request):
+        permission_classes = [permissions.IsAuthenticated]
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+
 
 @api_view(['GET'])
 def now_playing(request):
@@ -159,10 +180,13 @@ def coming_soon(request):
     else:
         return Response({'message': 'No movies found'}, status=404)
 
-
+# Add lifetime to codes
 @api_view(['GET'])
 def reg_veri(request, email): 
     if email:
+        prev_code = RegistrationCode.objects.filter(email=email)
+        if prev_code.exists():
+            prev_code.delete()
         reg_code = random.randint(100000, 999999)
         subject = 'Registration Verification'
         message = f'Your registration code is {reg_code}'
@@ -228,3 +252,43 @@ def login_user(request):
     if long_session:
         request.session.set_expiry(30*24*60*60)
     return Response({'message': 'Login successful'}, status=200)
+
+@api_view(['POST'])
+def logout_user(request):
+    logout(request)
+    return Response({'message': 'User logged out'}, status=200)
+
+
+#untested!!!! (Also need to add to urls)
+@api_view(['POST'])
+def reset_password(request):
+    password = request.data.get('password')
+    email = request.data.get('email')
+    code = request.data.get('code')
+    if password and email and code:
+        user = get_user_model().objects.get(email=email)
+        if not user:
+            return Response({'message': 'User not found'}, status=404)
+        reset_code = PasswordResetCode.objects.filter(email=email, code=code)
+        if not reset_code.exists():
+            return Response({'message': 'Invalid reset code'}, status=400)
+        reset_code.delete()
+        user.set_password(password)
+        user.save()
+        return Response({'message': 'Password reset successful'}, status=200)
+    else:
+        return Response({'message': 'Missing required fields'}, status=400)
+
+
+@api_view(['POST'])
+def change_password(request):
+    user = request.user
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
+    if not user.check_password(old_password):
+        return Response({'message': 'Invalid old password'}, status=400)
+    user.set_password(new_password)
+    user.save()
+    return Response({'message': 'Password changed successfully'}, status=200)
+
+

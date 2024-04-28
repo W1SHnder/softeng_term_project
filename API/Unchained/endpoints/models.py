@@ -107,6 +107,7 @@ class PaymentCard(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, blank=True, null=True)
     card_type = models.CharField(max_length=32, blank=True, null=True)
     card_number = models.CharField(max_length=256, blank=True, null=True)
+    expiration_date = models.DateField(blank=True, null=True)
     address1 = models.TextField(blank=True, null=True)
     address2 = models.TextField(blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
