@@ -77,7 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if not self.request.user.is_staff:
-            queryset = queryset.filter(id=self.request.user.id)
+            queryset = queryset.filte/r(id=self.request.user.id)
         return queryset
 
     def list(self, request):
@@ -182,17 +182,17 @@ def coming_soon(request):
 
 # Add lifetime to codes
 @api_view(['GET'])
-def reg_veri(request, email): 
+def verify_email(request, email): 
     if email:
-        prev_code = RegistrationCode.objects.filter(email=email)
+        prev_code = VerificationCode.objects.filter(email=email)
         if prev_code.exists():
             prev_code.delete()
         reg_code = random.randint(100000, 999999)
-        subject = 'Registration Verification'
-        message = f'Your registration code is {reg_code}'
+        subject = 'GoofyMovies: Verification Code'
+        message = f'Your verification code for GoofyMovies is {reg_code}'
         try:
             send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
-            reg_code_obj = RegistrationCode(email=email, code=reg_code)
+            reg_code_obj = VerificationCode(email=email, code=reg_code)
             reg_code_obj.save()
             return Response({'message': 'Registration code sent'}, status=200)
         except Exception as e:
@@ -216,12 +216,14 @@ def register_user(request):
 
     if fname and lname and phone and email and pword and reg_code:
         # Validate registration code
-        real_code = RegistrationCode.objects.filter(email=email, code=reg_code)
+        real_code = VerificationCode.objects.filter(email=email, code=reg_code)
         if not real_code.exists():
             return Response({'message': 'Invalid registration code'}, status=400)
         real_code.delete()
 
         #Create new user instance
+        if user_class.objects.filter(email.email).exists():
+            return Response({'message': 'User already exists'}, status=400)
         new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
         new_user.save()
 
@@ -261,7 +263,7 @@ def logout_user(request):
 
 #untested!!!! (Also need to add to urls)
 @api_view(['POST'])
-def reset_password(request):
+def recover_password(request):
     password = request.data.get('password')
     email = request.data.get('email')
     code = request.data.get('code')
@@ -269,7 +271,7 @@ def reset_password(request):
         user = get_user_model().objects.get(email=email)
         if not user:
             return Response({'message': 'User not found'}, status=404)
-        reset_code = PasswordResetCode.objects.filter(email=email, code=code)
+        reset_code = VerificationCode.objects.filter(email=email, code=code)
         if not reset_code.exists():
             return Response({'message': 'Invalid reset code'}, status=400)
         reset_code.delete()

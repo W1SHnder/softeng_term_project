@@ -169,7 +169,7 @@ class Transaction(models.Model):
         db_table = 'Transaction'
 
 
-class RegistrationCode(models.Model):
+class VerificationCode(models.Model):
     email = models.CharField(max_length=64)
     code = models.CharField(max_length=8)
     

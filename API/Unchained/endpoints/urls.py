@@ -73,13 +73,14 @@ urlpatterns = [
     path('Showtime/<int:pk>/', showtime_detail, name='showtime-detail'),
     path('Showroom/', showroom_list, name='showroom-list'),
     path('Showroom/<int:pk>/', showroom_detail, name='showroom-detail'),
-    path('Verify/<str:email>', views.reg_veri),
+    path('Verify/<str:email>', views.verify_email),
     path('Register/', views.register_user),
     path('Login/', views.login_user),
     path('Logout/', views.logout_user),
     path('User/', user_detail, name='user-detail'),
     path('UserList/', user_list, name='user-list'),
     path('ChangePassword/', views.change_password),
+    path('RecoverPassword/', views.recover_password),
     path('UserAdmin/<int:pk>/', user_admin, name='user-admin')
 ]
  
