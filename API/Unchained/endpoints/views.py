@@ -211,7 +211,7 @@ def register_user(request):
     pword = request.data.get('password')
     reg_code = request.data.get('code')
     
-    payment_cards = request.data.get('payment_cards')
+    payment_card = request.data.get('payment_card')
     shipping_addr = request.data.get('shipping_address')
 
     if fname and lname and phone and email and pword and reg_code:
@@ -222,16 +222,15 @@ def register_user(request):
         real_code.delete()
 
         #Create new user instance
-        if user_class.objects.filter(email.email).exists():
+        if user_class.objects.filter(email=email).exists():
             return Response({'message': 'User already exists'}, status=400)
         new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
         new_user.save()
 
         #Add optional user fields [UNTESTED!!!!!!!]
-        if payment_cards:
-            for card in payment_cards:
-                card_obj = PaymentCard(user=new_user, **card)
-                card_obj.save()
+        if payment_card:
+            card_obj = PaymentCard(user=new_user, **payment_card)
+            card_obj.save()
         if shipping_addr:
             addr_obj = ShippingAddress(user=new_user, **shipping_addr)
             addr_obj.save()
@@ -261,7 +260,6 @@ def logout_user(request):
     return Response({'message': 'User logged out'}, status=200)
 
 
-#untested!!!! (Also need to add to urls)
 @api_view(['POST'])
 def recover_password(request):
     password = request.data.get('password')
