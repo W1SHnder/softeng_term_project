@@ -48,8 +48,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     phone = models.CharField(_('phone number'), max_length=16, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+    promotions = models.BooleanField(_('promotions'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
+    promotions_opt_in = models.BooleanField(_('promotions_opt_in'), default=False)
 
     objects = UserManager()
 
@@ -88,6 +90,7 @@ class Movie(models.Model):
     trailer_picture = models.CharField(max_length=255, blank=True, null=False)
     trailer_video = models.CharField(max_length=255, blank=True, null=False)
     mpaa_rating = models.CharField(max_length=8, blank=True, null=True)
+    ticket_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
     class Meta:
         db_table = 'Movie'
@@ -150,9 +153,15 @@ class Theatre(models.Model):
     class Meta:    
         db_table = 'Theatre'
 
+class TicketType(models.Model):
+    type_name = models.CharField(max_length=6, blank=False, null=False)
+    price_modifier = models.DecimalField(max_digits=5, decimal_places=2, blank=False, null=False)
+
+    class Meta:
+        db_table = 'TicketType'
 
 class Ticket(models.Model):
-    type = models.CharField(max_length=6, blank=True, null=True)
+    type = models.ForeignKey(TicketType, models.CASCADE) 
     showtime = models.ForeignKey(Showtime, models.DO_NOTHING)
     seat_num = models.IntegerField(unique=True)
     booking = models.ForeignKey(Booking, models.DO_NOTHING, blank=True, null=True)
@@ -188,3 +197,11 @@ class ShippingAddress(models.Model):
     class Meta:
         db_table = 'ShippingAddress'
 
+
+class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    booking = models.ForeignKey(Booking, models.CASCADE)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'Order'

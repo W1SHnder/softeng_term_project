@@ -1,5 +1,4 @@
 import random
-
 from rest_framework import generics, renderers, viewsets, permissions
 from datetime import datetime, timedelta
 from django.shortcuts import render
@@ -15,7 +14,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 
 
 # Create your views here. 
-        
+
 
 class MovieViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
@@ -62,10 +61,35 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
     queryset = Showtime.objects.all()
     serializer_class = ShowtimeSerializer 
 
+    def create(self, request):
+        permission_classes = [permissions.IsAdminUser]
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+    def update(self, request, pk=None):
+        permission_classes = [permissions.IsAdminUser]
+        queryset = Showtime.objects.get(id=pk)
+        serializer = self.serializer_class(queryset, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
 
 class ShowroomViewSet(viewsets.ModelViewSet):
     queryset = Showroom.objects.all()
     serializer_class = ShowroomSerializer
+    
+    def create(self, request):
+        permission_classes = [permissions.IsAdminUser]
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -119,7 +143,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-   
+
+
 class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
     queryset = Booking.objects.all()
@@ -151,8 +176,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=400)
 
 
-
-
 @api_view(['GET'])
 def now_playing(request):
     current_date = datetime.now().date()
@@ -179,6 +202,7 @@ def coming_soon(request):
         return Response(serializer.data)
     else:
         return Response({'message': 'No movies found'}, status=404)
+
 
 # Add lifetime to codes
 @api_view(['GET'])
@@ -209,8 +233,9 @@ def register_user(request):
     phone = request.data.get('phone')
     email = request.data.get('email')
     pword = request.data.get('password')
+    promotions = request.data.get('promotions_opt_in')
     reg_code = request.data.get('code')
-    
+     
     payment_card = request.data.get('payment_card')
     shipping_addr = request.data.get('shipping_address')
 
@@ -224,16 +249,16 @@ def register_user(request):
         #Create new user instance
         if user_class.objects.filter(email=email).exists():
             return Response({'message': 'User already exists'}, status=400)
-        new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, phone=phone)
-        new_user.save()
+        new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, 
+                                                  phone=phone, promotions_opt_in=promotions)
 
-        #Add optional user fields [UNTESTED!!!!!!!]
         if payment_card:
             card_obj = PaymentCard(user=new_user, **payment_card)
             card_obj.save()
         if shipping_addr:
             addr_obj = ShippingAddress(user=new_user, **shipping_addr)
             addr_obj.save()
+
         return Response({'message': 'User registered'}, status=201)
     else:
         return Response({'message': 'Missing required fields'}, status=400)
@@ -292,3 +317,27 @@ def change_password(request):
     return Response({'message': 'Password changed successfully'}, status=200)
 
 
+
+#Add booking capabilities for booking tickets
+
+
+@api_view(['POST'])
+def place_order(request):
+    permission_classes = [permissions.IsAuthenticated]
+    user = request.user
+    order_id = request.data.get('order_id')
+    payment_id = request.data.get('payment_id')
+
+    if not order or not payment:
+        return Response({'message': 'Missing required fields'}, status=400)
+
+    order = Booking.objects.get(id=order_id)
+    payment = Payment.objects.get(id=payment_id)
+
+    if order.user != user:
+        return Response({'message': 'Unauthorized'}, status=403)
+
+    print('Order placed') # Placeholder for order processing
+    order.completed = True
+    order.save()
+    return Response({'message': 'Order placed'}, status=200)
