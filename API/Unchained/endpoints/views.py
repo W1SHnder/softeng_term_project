@@ -341,3 +341,6 @@ def place_order(request):
     order.completed = True
     order.save()
     return Response({'message': 'Order placed'}, status=200)
+
+
+#bullshit test comment
