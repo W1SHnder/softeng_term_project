@@ -11,6 +11,7 @@ function Validation(values, currentStep) {
         } else {
             error.email = "";
         }
+
     } else if (currentStep === 2) {
         if (values.password === "") {
             error.password = "Password should not be empty";
