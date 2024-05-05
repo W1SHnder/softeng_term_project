@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './styles/Users.css';
 function AddUserForm({ addUser }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -93,7 +94,6 @@ function UserList({ users, removeUser, suspendUser, updateUser }) {
 
 function Users() {
     const [users, setUsers] = useState([]);
-    const [movies, setMovies] = useState([]);
 
     const addUser = (user) => {
         setUsers([...users, user]);
@@ -118,7 +118,7 @@ function Users() {
 
     return (
         <div className="Users">
-            <div>
+            <div className='user-form'>
                 <h1>Manage Users</h1>
                 <AddUserForm addUser={addUser} />
                 <h2>Users</h2>

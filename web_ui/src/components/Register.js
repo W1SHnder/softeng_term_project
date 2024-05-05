@@ -3,22 +3,20 @@ import Validation from './RegisterValidation';
 import './styles/Register.css';
 
 const RegisterScreen = () => {
-    const [values, setValues] = useState({
-        email: '',
-        password: '',
-        confirm_password: '',
-        address: ''
-    })
+    const [values, setValues] = useState({})
     const [errors, setErrors] = useState({})
     const handleInput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }))
-    }
+        const { name, value } = event.target;
+        // Update the values state with the new field-value pair
+        setValues(prevValues => ({ ...prevValues, [name]: value }));
+    };
 
     const [currentStep, setCurrentStep] = useState(1);
 
     const handleNext = () => {
         setErrors(Validation(values, currentStep));
     };
+
 
     useEffect(() => {
         if (currentStep === 1 && errors.email !== "") {
@@ -51,12 +49,27 @@ const RegisterScreen = () => {
         eyeIcon.classList.toggle('bi-eye');
     }
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            // Convert values object to JSON string
+            const jsonData = JSON.stringify(values);
+
+            // Send JSON data to backend
+            const response = await axios.post('/API/Register', jsonData);
+            console.log(response.data); // Assuming backend returns some response
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     return (
         <div class="login-container">
             <div className="progress-bar">
                 <span className={currentStep === 1 ? "dot active" : "dot"} onClick={() => goToStep(1)}></span>
                 <span className={currentStep === 2 ? "dot active" : "dot"} onClick={() => goToStep(2)}></span>
                 <span className={currentStep === 3 ? "dot active" : "dot"} onClick={() => goToStep(3)}></span>
+                <span className={currentStep === 4 ? "dot active" : "dot"} onClick={() => goToStep(4)}></span>
             </div>
             <h2>Sign Up</h2>
             <div className='underline'></div>
@@ -69,8 +82,14 @@ const RegisterScreen = () => {
                         </div>
                         {errors.email && <span className="text-danger">{errors.email}</span>}
                         <div className="form-group">
-                            <label htmlFor="firstName">Username</label>
-                            <input type="text" id="firstName" name="first-name" placeholder="moviefan"></input>
+                            <div className='first-name'>
+                                <label htmlFor="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName" placeholder="John" value={values.first_name}></input>
+                            </div>
+                            <div className='last-name'>
+                                <label htmlFor="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" placeholder="Smith" value={values.last_name}></input>
+                            </div>
                         </div>
                         <button type="button" className="next-btn" onClick={handleNext}>Next</button>
                     </div>
@@ -99,10 +118,34 @@ const RegisterScreen = () => {
                 {currentStep === 3 && (
                     <div className="step step-3 active">
                         <div className="form-group">
-                            <label htmlFor="bankroll">Address</label>
-                            <input type="text" id="address" name="address" placeholder='555 Movie Ave'></input>
+                            <label htmlFor="phone">Phone Number</label>
+                            <input type="text" id="phone-number" name="phoneNumber" placeholder='555-5555-5555' value={values.phone}></input>
                         </div>
-                        <button type="submit" className="submit-btn">Submit</button>
+                        <div className="form-group">
+                            <label htmlFor="street">Address (optional)</label>
+                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' value={values.address}></input>
+                            <input type="text" id="city" name="city" placeholder='Athens' value={values.city}></input>
+                            <input type="text" id="state" name="state" placeholder='Georgia' value={values.state}></input>
+                            <input type="text" id="zip" name="zip" placeholder='55555' value={values.zip}></input>
+                        </div>
+                        <button type="button" className="next-btn" onClick={handleNext}>Next</button>
+                    </div>
+                )}
+                {currentStep === 4 && (
+                    <div className="step step-3 active">
+                        <div className="form-group">
+                            <label htmlFor="street">Card Information (optional)</label>
+                            <input type="text" id="card" name="card" placeholder='card type' value={values.card_type}></input>
+                            <input type="text" id="cardNumber" name="cardNumber" placeholder='card number' value={values.card_number}></input>
+                            <input type="text" id="expiration" name="expiration" placeholder='expiration date' value={values.card_expiration}></input>
+                            <input type="text" id="cvv" name="cvv" placeholder='cvv' value={values.card_cvv}></input>
+                            <label htmlFor="street">Billing Address</label>
+                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' value={values.billing_address}></input>
+                            <input type="text" id="city" name="city" placeholder='Athens' value={values.billing_city}></input>
+                            <input type="text" id="state" name="state" placeholder='Georgia' value={values.billing_state}></input>
+                            <input type="text" id="zip" name="zip" placeholder='55555' value={values.billing_zip}></input>
+                        </div>
+                        <button type="submit" className="submit-btn" onClick={handleSubmit}>Submit</button>
                     </div>
                 )}
             </form>
