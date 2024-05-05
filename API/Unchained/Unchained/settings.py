@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'django.middleware.common.CommonMiddleware'
 ]
 
 ROOT_URLCONF = 'Unchained.urls'
@@ -152,5 +156,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'defnotphishing99@gmail.com'
 EMAIL_HOST_PASSWORD = 'qihcawhpzqmqdizp'
 
-
+CORS_ORIGIN_ALLOW_ALL = True
 
