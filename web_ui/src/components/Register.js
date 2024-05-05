@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { json } from 'react-router-dom';
 import Validation from './RegisterValidation';
+import axios from 'axios';
 import './styles/Register.css';
 
 const RegisterScreen = () => {
@@ -17,6 +19,16 @@ const RegisterScreen = () => {
         setErrors(Validation(values, currentStep));
     };
 
+    const sendEmail = async (event) => {
+        setErrors(Validation(values, currentStep));
+        event.preventDefault();
+        try {
+          const response = await axios.get(`http://127.0.0.1:8000/Verify/${values.email}`);
+          console.log(response.data.message);
+        } catch (error) {
+          console.error('Error fetching data:', error.response.data.message);
+        }
+      };
 
     useEffect(() => {
         if (currentStep === 1 && errors.email !== "") {
@@ -51,16 +63,38 @@ const RegisterScreen = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try {
-            // Convert values object to JSON string
-            const jsonData = JSON.stringify(values);
 
-            // Send JSON data to backend
-            const response = await axios.post('/API/Register', jsonData);
-            console.log(response.data); // Assuming backend returns some response
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        const registrationData = {
+            "email": values.email,
+            "first_name": values.first_name,
+            "last_name": values.last_name,
+            "phone": values.phone,
+            "password": values.password,
+            "reg_code": values.reg_code,
+        };
+
+        // Convert JSON object to string
+        const jsonData = JSON.stringify(registrationData);
+
+        fetch('/Register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: jsonData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     };
 
     return (
@@ -73,7 +107,7 @@ const RegisterScreen = () => {
             </div>
             <h2>Sign Up</h2>
             <div className='underline'></div>
-            <form action="server" method="post">
+            <form>
                 {currentStep === 1 && (
                     <div className="step step-1 active">
                         <div className="form-group">
@@ -84,12 +118,14 @@ const RegisterScreen = () => {
                         <div className="form-group">
                             <div className='first-name'>
                                 <label htmlFor="firstName">First Name</label>
-                                <input type="text" id="firstName" name="firstName" placeholder="John" value={values.first_name}></input>
+                                <input type="text" id="firstName" name="firstName" placeholder="John" onChange={handleInput} value={values.first_name}></input>
                             </div>
+                            {errors.first_name && <span className="text-danger">{errors.first_name}</span>}
                             <div className='last-name'>
                                 <label htmlFor="lastName">Last Name</label>
-                                <input type="text" id="lastName" name="lastName" placeholder="Smith" value={values.last_name}></input>
+                                <input type="text" id="lastName" name="lastName" placeholder="Smith" onChange={handleInput} value={values.last_name}></input>
                             </div>
+                            {errors.email && <span className="text-danger">{errors.email}</span>}
                         </div>
                         <button type="button" className="next-btn" onClick={handleNext}>Next</button>
                     </div>
@@ -119,33 +155,42 @@ const RegisterScreen = () => {
                     <div className="step step-3 active">
                         <div className="form-group">
                             <label htmlFor="phone">Phone Number</label>
-                            <input type="text" id="phone-number" name="phoneNumber" placeholder='555-5555-5555' value={values.phone}></input>
+                            <input type="text" id="phone-number" name="phoneNumber" placeholder='555-5555-5555' onChange={handleInput} value={values.phone}></input>
                         </div>
                         <div className="form-group">
                             <label htmlFor="street">Address (optional)</label>
-                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' value={values.address}></input>
-                            <input type="text" id="city" name="city" placeholder='Athens' value={values.city}></input>
-                            <input type="text" id="state" name="state" placeholder='Georgia' value={values.state}></input>
-                            <input type="text" id="zip" name="zip" placeholder='55555' value={values.zip}></input>
+                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' onChange={handleInput} value={values.address}></input>
+                            <input type="text" id="city" name="city" placeholder='Athens' onChange={handleInput} value={values.city}></input>
+                            <input type="text" id="state" name="state" placeholder='Georgia' onChange={handleInput} value={values.state}></input>
+                            <input type="text" id="zip" name="zip" placeholder='55555' onChange={handleInput} value={values.zip}></input>
                         </div>
                         <button type="button" className="next-btn" onClick={handleNext}>Next</button>
                     </div>
                 )}
                 {currentStep === 4 && (
-                    <div className="step step-3 active">
+                    <div className="step step-4 active">
                         <div className="form-group">
                             <label htmlFor="street">Card Information (optional)</label>
-                            <input type="text" id="card" name="card" placeholder='card type' value={values.card_type}></input>
-                            <input type="text" id="cardNumber" name="cardNumber" placeholder='card number' value={values.card_number}></input>
-                            <input type="text" id="expiration" name="expiration" placeholder='expiration date' value={values.card_expiration}></input>
-                            <input type="text" id="cvv" name="cvv" placeholder='cvv' value={values.card_cvv}></input>
+                            <input type="text" id="card" name="card" placeholder='card type' onChange={handleInput} value={values.card_type}></input>
+                            <input type="text" id="cardNumber" name="cardNumber" placeholder='card number' onChange={handleInput} value={values.card_number}></input>
+                            <input type="text" id="expiration" name="expiration" placeholder='expiration date' onChange={handleInput} value={values.card_expiration}></input>
+                            <input type="text" id="cvv" name="cvv" placeholder='cvv' onChange={handleInput} value={values.card_cvv}></input>
                             <label htmlFor="street">Billing Address</label>
-                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' value={values.billing_address}></input>
-                            <input type="text" id="city" name="city" placeholder='Athens' value={values.billing_city}></input>
-                            <input type="text" id="state" name="state" placeholder='Georgia' value={values.billing_state}></input>
-                            <input type="text" id="zip" name="zip" placeholder='55555' value={values.billing_zip}></input>
+                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' onChange={handleInput} value={values.billing_address}></input>
+                            <input type="text" id="city" name="city" placeholder='Athens' onChange={handleInput} value={values.billing_city}></input>
+                            <input type="text" id="state" name="state" placeholder='Georgia' onChange={handleInput} value={values.billing_state}></input>
+                            <input type="text" id="zip" name="zip" placeholder='55555' onChange={handleInput} value={values.billing_zip}></input>
                         </div>
-                        <button type="submit" className="submit-btn" onClick={handleSubmit}>Submit</button>
+                        <button type="button" className="next-btn" onClick={sendEmail}>Submit</button>
+                    </div>
+                )}
+                {currentStep === 5 && (
+                    <div className="step step-5 active">
+                        <div className="form-group">
+                            <label htmlFor="code" className="header">Code</label>
+                            <input type="text" id="code" name="code" placeholder="Code" onChange={handleInput} value={values.reg_code} ></input>
+                        </div>
+                        <button type="submit" className="submit-btn" onClick={handleSubmit}>Verify</button>
                     </div>
                 )}
             </form>
