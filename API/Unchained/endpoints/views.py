@@ -343,4 +343,4 @@ def place_order(request):
     return Response({'message': 'Order placed'}, status=200)
 
 
-#bullshit test comment
+#bullshit test comment part 2

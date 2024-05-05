@@ -6,7 +6,7 @@ import Admin from "./components/Admin"
 =======
 import Login from "./components/Login"
 import Register from "./components/Register";
->>>>>>> 8be683f (login, register, admin)
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register />,
   }
->>>>>>> 8be683f (login, register, admin)
+
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
