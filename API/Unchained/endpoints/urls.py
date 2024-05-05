@@ -32,7 +32,6 @@ showtime_list = views.ShowtimeViewSet.as_view({
 showtime_detail = views.ShowtimeViewSet.as_view({
     'get': 'retrieve',
     'put': 'update',
-    'patch': 'partial_update',
     'delete': 'destroy'
 })
 

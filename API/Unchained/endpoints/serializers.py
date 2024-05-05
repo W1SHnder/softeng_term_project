@@ -14,7 +14,7 @@ class ShowtimeSerializer(serializers.ModelSerializer):
     showroom = ShowroomSerializer(read_only=True)
     class Meta:
         model = Showtime
-        fields = ['url', 'id', 'showroom', 'start', 'end']
+        fields = ['url', 'id', 'showroom', 'time']
         read_only_fields = ['showroom']
 
 
@@ -23,7 +23,7 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = ['id', 'title', 'category', 'director', 'producer', 'cast', 
-                'synopsis', 'trailer_picture', 'trailer_video', 'mpaa_rating']
+                'synopsis', 'trailer_picture', 'trailer_video', 'mpaa_rating', 'showtimes']
         read_only_fields = ['showtimes']
 
 

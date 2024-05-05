@@ -20,8 +20,23 @@ class MovieViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        title = self.kwargs['title']
+        category = self.kwargs['category']
+        date = self.kwargs['date']
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        if category:
+            queryset = queryset.filter(category__icontains=category)
+        if date:
+            format_date = make_aware(datetime.strptime(date, '%Y-%m-%d'))
+            queryset = queryset.filter(showtimes__time__date=specified_day)
 
     def list(self, request):
+        #Remove and test
         queryset = Movie.objects.all()
         title = request.query_params.get('title', None)
         category = request.query_params.get('category', None)
@@ -34,30 +49,24 @@ class MovieViewSet(viewsets.ModelViewSet):
         
         serializer = self.serializer_class(queryset, many=True, context={'request': request})
         return Response(serializer.data)
-     
+    
+    def create(self, request):
+        permission_classes = [permissions.IsAdminUser]
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
     @action(detail=True, methods=['get'])
     def showtimes(self, request, pk=None):
         showtimes = Showtime.objects.filter(movie_id=pk)
         serializer = ShowtimeSerializer(showtimes, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def create(self, request):
-        permission_classes = [permissions.IsAdminUser]
-        showtimes = request.data.pop('showtimes')
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        for showtime in showtimes:
-            showtime['movie'] = serializer.data['id']
-            showtime_serializer = ShowtimeSerializer(data=showtime)
-            if showtime_serializer.is_valid():
-                showtime_serializer.save()
-            return Response(serializer.errors, status=400)
-        return Response(serializer.errors, status=400)
-
 
 class ShowtimeViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticatedOrReadOnly]
     queryset = Showtime.objects.all()
     serializer_class = ShowtimeSerializer 
 
@@ -250,7 +259,7 @@ def register_user(request):
         if user_class.objects.filter(email=email).exists():
             return Response({'message': 'User already exists'}, status=400)
         new_user = user_class.objects.create_user(email=email, password=pword, first_name=fname, last_name=lname, 
-                                                  phone=phone, promotions_opt_in=promotions)
+                                                  phone=phone, promotions=promotions)
 
         if payment_card:
             card_obj = PaymentCard(user=new_user, **payment_card)
@@ -343,4 +352,7 @@ def place_order(request):
     return Response({'message': 'Order placed'}, status=200)
 
 
-#bullshit test comment part 2
+#Fix date filtering in movies
+
+#ADD CREATION OF TICKETS
+#MAKE SURE TO RESTRICT NUMBER BY SHOWTIME CAPACITY
