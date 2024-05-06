@@ -8,8 +8,13 @@ function Validation(values, currentStep) {
             error.email = "Email should not be empty";
         } else if (!email_pattern.test(values.email)) {
             error.email = "Invalid email";
-        } else {
-            error.email = "";
+        }
+
+        if (!values.first_name) {
+            error.first_name = "First name should not be empty";
+        }
+        if (!values.last_name) {
+            error.last_name = "Last name should not be empty";
         }
 
     } else if (currentStep === 2) {
@@ -19,14 +24,10 @@ function Validation(values, currentStep) {
             error.password = "Invalid password";
         } else if (values.password !== values.confirm_password) {
             error.password = "Passwords do not match";
-        } else {
-            error.password = "";
         }
     } else if (currentStep === 3) {
-        if (values.password === "") {
-            error.address = "Address should not be empty";
-        } else {
-            error.address = "";
+        if (!values.phone) {
+            error.phone = "Phone should not be empty";
         }
     }
 
