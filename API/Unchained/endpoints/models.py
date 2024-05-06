@@ -80,7 +80,7 @@ class Booking(models.Model):
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=False)
+    title = models.CharField(max_length=255, blank=True, null=False, unique=True)
     category = models.CharField(max_length=255, blank=True, null=True)
     director = models.CharField(max_length=255, blank=True, null=True)
     producer = models.CharField(max_length=255, blank=True, null=True)
@@ -140,8 +140,7 @@ class Showroom(models.Model):
 class Showtime(models.Model):
     movie = models.ForeignKey(Movie, models.DO_NOTHING, blank=True, null=True)
     showroom = models.ForeignKey(Showroom, models.DO_NOTHING, blank=True, null=False)
-    start = models.DateTimeField(blank=True, null=True)  
-    end = models.DateTimeField(blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)  
 
     class Meta:
         db_table = 'Showtime'
