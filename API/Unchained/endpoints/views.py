@@ -23,31 +23,28 @@ class MovieViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         queryset = super().get_queryset()
-        title = self.kwargs['title']
-        category = self.kwargs['category']
-        date = self.kwargs['date']
+        title = self.request.query_params.get('title', None)
+        category = self.request.query_params.get('category', None)
+        date = self.request.query_params.get('date', None)
 
         if title:
             queryset = queryset.filter(title__icontains=title)
         if category:
             queryset = queryset.filter(category__icontains=category)
         if date:
-            format_date = make_aware(datetime.strptime(date, '%Y-%m-%d'))
-            queryset = queryset.filter(showtimes__time__date=specified_day)
+            format_date = datetime.strptime(date, '%Y-%m-%d')
+            queryset = queryset.filter(showtime__time__date=format_date).distinct()
+
+        return queryset
 
     def list(self, request):
         #Remove and test
-        queryset = Movie.objects.all()
-        title = request.query_params.get('title', None)
-        category = request.query_params.get('category', None)
+        queryset = self.get_queryset()
         date = request.query_params.get('date', None)
-
-        if title:
-            queryset = queryset.filter(title__icontains=title)
-        if category:
-            queryset = queryset.filter(category__icontains=category)
-        
-        serializer = self.serializer_class(queryset, many=True, context={'request': request})
+ 
+        #serializer_context = {'request': self.request, 'date': date}
+        #serializer = self.serializer_class(queryset, many=True, context=serializer_context)
+        serializer = self.serializer_class(queryset, many=True, context={'request': request, 'date': date})
         return Response(serializer.data)
     
     def create(self, request):
@@ -188,7 +185,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 def now_playing(request):
     current_date = datetime.now().date()
-    movies = Movie.objects.filter(id__in=Showtime.objects.filter(start__date=current_date)).distinct()
+    movies = Movie.objects.filter(id__in=Showtime.objects.filter(time__date=current_date)).distinct()
     #movies = Movie.objects.all() 
     if movies.exists():
         serializer = MovieSerializer(movies, many=True, context={'request': request})
@@ -203,8 +200,8 @@ def coming_soon(request):
     yesterday = current_date - timedelta(days=1)
 
     movies = Movie.objects.filter(
-            id__in=Showtime.objects.filter(date__gt=date.today()).values('movie_id')).exclude(
-            id__in=Showtime.objects.filter(date__gt=date.today()).values('movie_id')).distinct()
+            id__in=Showtime.objects.filter(time__gt=today).values('movie_id')).exclude(
+            id__in=Showtime.objects.filter(time__lte=yesterday).values('movie_id')).distinct()
 
     if movies.exists():
         serializer = MovieSerializer(movies, many=True)

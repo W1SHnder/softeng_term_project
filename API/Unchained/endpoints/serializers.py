@@ -3,28 +3,50 @@ from rest_framework import serializers
 from .models import *
 from .views import *
 from django.conf import settings
+from datetime import datetime
 
 
 class ShowroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Showroom
-        fields = ['url', 'id', 'name', 'seats', 'showtimes']
+        fields = ['id', 'name', 'seats', 'showtimes']
 
 class ShowtimeSerializer(serializers.ModelSerializer):
-    showroom = ShowroomSerializer(read_only=True)
+    showroom = serializers.PrimaryKeyRelatedField(queryset=Showroom.objects.all())
     class Meta:
         model = Showtime
-        fields = ['url', 'id', 'showroom', 'time']
+        fields = ['id', 'showroom', 'time']
         read_only_fields = ['showroom']
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    showtimes = ShowtimeSerializer(many=True, read_only=True)
+    #showtimes = ShowtimeSerializer(many=True, read_only=True)
+    showtimes = serializers.SerializerMethodField() 
     class Meta:
         model = Movie
         fields = ['id', 'title', 'category', 'director', 'producer', 'cast', 
                 'synopsis', 'trailer_picture', 'trailer_video', 'mpaa_rating', 'showtimes']
         read_only_fields = ['showtimes']
+    
+    def get_showtimes(self, instance):
+        query_date = self.context.get('date')
+        #if request:
+            #query_date = datetime.strptime(request.query_params.get('date'), '%Y-%m-%d')
+        if query_date:
+            inst_showtimes = instance.showtime_set.filter(time__date=query_date)
+        else:
+            inst_showtimes = instance.showtime_set.all()
+        return ShowtimeSerializer(inst_showtimes, many=True).data
+
+    #def to_representation(self, instance):
+       # ret = super().to_representation(instance)
+       # query_date = self.context.get('date')
+       # inst_showtimes = instance.showtime_set.all()
+        #if query_date:
+        #    inst_showtimes = inst_showtimes.filter(time__date=query_date)
+       # ret['showtimes'] = ShowtimeSerializer(inst_showtimes, many=True).data
+        #return ret
+        
 
 
 class PaymentCardSerializer(serializers.ModelSerializer):
