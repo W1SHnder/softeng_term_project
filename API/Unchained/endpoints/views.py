@@ -182,6 +182,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=400)
 
 
+class TicketViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Ticket.objects.all()
+
+
 @api_view(['GET'])
 def now_playing(request):
     current_date = datetime.now().date() 
@@ -349,7 +354,23 @@ def place_order(request):
     return Response({'message': 'Order placed'}, status=200)
 
 
-#Fix date filtering in movies
+@api_view(['PUT'])
+def book_ticket(request):
+    permission_classes = [permissions.IsAuthenticated]
+    user = request.user
+    booking_id = request.data.get('booking_id')
+    ticket_id = request.data.get('ticket_id')
 
-#ADD CREATION OF TICKETS
-#MAKE SURE TO RESTRICT NUMBER BY SHOWTIME CAPACITY
+    if not booking_id or not ticket_id:
+        return Response({'message': 'Missing required fields'}, status=400)
+
+    booking = Booking.objects.get(id=booking_id)
+    ticket = Ticket.objects.get(id=ticket_id)
+
+    if booking.user != user:
+        return Response({'message': 'Unauthorized'}, status=403)
+    
+    ticket.booking = booking
+    ticket.save()
+
+    return Response({'message': 'Ticket added to booking'}, status=200)

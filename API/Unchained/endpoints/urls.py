@@ -62,6 +62,17 @@ user_admin = views.UserAdminViewSet.as_view({
     'put': 'update'
 })
 
+ticket_list = views.TicketViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+ticket_detail = views.TicketViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'delete': 'destroy',
+})
+
 urlpatterns = [
     path('NowPlaying/', views.now_playing),
     path('ComingSoon/', views.coming_soon),
@@ -72,15 +83,19 @@ urlpatterns = [
     path('Showtime/<int:pk>/', showtime_detail, name='showtime-detail'),
     path('Showroom/', showroom_list, name='showroom-list'),
     path('Showroom/<int:pk>/', showroom_detail, name='showroom-detail'),
-    path('Verify/<str:email>', views.verify_email),
+    path('Ticket/', ticket_list, name='ticket-list'),
+    path('Ticket/<int:pk>/', ticket_detail, name='ticket-detail'),
+    path('User/', user_detail, name='user-detail'),
+    path('UserList/', user_list, name='user-list'),
+    path('UserAdmin/<int:pk>/', user_admin, name='user-admin'),
+    path('BookTicket/', views.book_ticket),          #PUT ONLY
+    path('Verify/<str:email>', views.verify_email),  #GET ONLY
+    #POST ONLY URLS
     path('Register/', views.register_user),
     path('Login/', views.login_user),
     path('Logout/', views.logout_user),
-    path('User/', user_detail, name='user-detail'),
-    path('UserList/', user_list, name='user-list'),
     path('ChangePassword/', views.change_password),
-    path('RecoverPassword/', views.recover_password),
-    path('UserAdmin/<int:pk>/', user_admin, name='user-admin')
+    path('RecoverPassword/', views.recover_password)
 ]
  
 

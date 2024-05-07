@@ -92,6 +92,22 @@ class TicketSerializer(serializers.ModelSerializer):
         base_price = obj.showtime.movie.ticket_price
         price_mod = self.type.price_mod
         return base_price * price_mod
+    
+    def validate_seat_num(self, value):
+        if not (1 <= value <= self.showtime.showroom.seats):
+            raise serializers.ValidationError("Seat number out of range")
+        return value
+
+    def validate(self, data):
+        showtime = data['showtime']
+        if showtime.time < datetime.now():
+            raise serializers.ValidationError("Cannot create tickets for past showtimes")
+        
+        current_ticket_count = Ticket.objects.filter(showtime=showtime).count()
+        if current_ticket_count >= showtime.showroom.seats:
+            raise serializers.ValidationError("Showtime is sold out")
+
+        return data
 
 
 class BookingSerializer(serializers.ModelSerializer):
