@@ -184,8 +184,8 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def now_playing(request):
-    current_date = datetime.now().date()
-    movies = Movie.objects.filter(id__in=Showtime.objects.filter(time__date=current_date)).distinct()
+    current_date = datetime.now().date() 
+    movies = Movie.objects.filter(showtime__time__date=current_date).distinct()
     #movies = Movie.objects.all() 
     if movies.exists():
         serializer = MovieSerializer(movies, many=True, context={'request': request})
@@ -197,7 +197,7 @@ def now_playing(request):
 @api_view(['GET'])
 def coming_soon(request):
     today = datetime.now().date()
-    yesterday = current_date - timedelta(days=1)
+    yesterday = today - timedelta(days=1)
 
     movies = Movie.objects.filter(
             id__in=Showtime.objects.filter(time__gt=today).values('movie_id')).exclude(
