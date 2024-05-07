@@ -5,6 +5,7 @@ import Admin from "./components/Admin"
 import Login from "./components/Login"
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
+import Profile from "./components/Profile";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path: '/forgotPassword',
     element: <ForgotPassword />,
+  },
+  {
+    path: '/profile',
+    element: <Profile />,
   }
 
 ]);

@@ -61,7 +61,6 @@ const RegisterScreen = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(values.promotions);
 
         const payment_card = {
             "card_type": values.card_type,
@@ -208,7 +207,7 @@ const RegisterScreen = () => {
 
 function Register() {
     return (
-        <div className="Login">
+        <div className="Register">
             <RegisterScreen />
         </div>
     );
