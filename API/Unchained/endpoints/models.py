@@ -51,7 +51,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     promotions = models.BooleanField(_('promotions'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
-    promotions_opt_in = models.BooleanField(_('promotions_opt_in'), default=False)
 
     objects = UserManager()
 

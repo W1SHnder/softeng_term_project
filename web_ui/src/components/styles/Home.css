@@ -59,6 +59,7 @@
 }
 
 .home-navbar button.active {
+  display: flex;
   background-color: #fff;
   color: #333;
 }
@@ -76,6 +77,21 @@
 }
 
 .search-bar button {
+  padding: 8px 12px; /* Reduce button padding */
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.utils-bar {
+  display: flex;
+  align-items: right;
+  justify-content: space-between;
+}
+
+.utils-bar button {
   padding: 8px 12px; /* Reduce button padding */
   border: none;
   border-radius: 5px;
