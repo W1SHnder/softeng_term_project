@@ -145,7 +145,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-
 #Email settings
 #Consider using django backend over yagmail
 
@@ -156,5 +155,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'defnotphishing99@gmail.com'
 EMAIL_HOST_PASSWORD = 'qihcawhpzqmqdizp'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'

@@ -7,42 +7,40 @@ import './styles/Register.css';
 const RegisterScreen = () => {
     const [values, setValues] = useState({})
     const [errors, setErrors] = useState({})
+
     const handleInput = (event) => {
-        const { name, value } = event.target;
-        // Update the values state with the new field-value pair
-        setValues(prevValues => ({ ...prevValues, [name]: value }));
+        const { name, value, type, checked } = event.target;
+        const inputValue = type === 'checkbox' ? checked : value;
+        setValues(prevValues => ({ ...prevValues, [name]: inputValue }));
     };
 
     const [currentStep, setCurrentStep] = useState(1);
 
     const handleNext = () => {
-        setErrors(Validation(values, currentStep));
+        const validationErrors = Validation(values, currentStep);
+        setErrors(validationErrors);
+        if (Object.keys(validationErrors).length === 0) {
+            setCurrentStep(currentStep + 1);
+        }
     };
 
     const sendEmail = async (event) => {
-        setErrors(Validation(values, currentStep));
+        setCurrentStep(currentStep + 1);
         event.preventDefault();
         try {
-          const response = await axios.get(`http://127.0.0.1:8000/Verify/${values.email}`);
-          console.log(response.data.message);
+            const response = await axios.get(`http://127.0.0.1:8000/Verify/${values.email}`);
         } catch (error) {
-          console.error('Error fetching data:', error.response.data.message);
+            console.error('Error fetching data:', error.response.data.message);
         }
-      };
-
-    useEffect(() => {
-        if (currentStep === 1 && errors.email !== "") {
-            return;
-        } else if (currentStep === 2 && (errors.password !== "")) {
-            return;
-        } else if (currentStep === 3 && (errors.address !== "")) {
-            return;
-        }
-        setCurrentStep(currentStep + 1);
-    }, [errors]);
+    };
 
     const goToStep = (step) => {
-        setCurrentStep(step);
+        const validationErrors = Validation(values, currentStep);
+        setErrors(validationErrors);
+        console.log(validationErrors);
+        if (Object.keys(validationErrors).length === 0) {
+            setCurrentStep(step);
+        }
     };
 
     const togglePassword = () => {
@@ -64,37 +62,43 @@ const RegisterScreen = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        const payment_card = {
+            "card_type": values.card_type,
+            "card_number": values.card_number,
+            "expiration_date": values.card_expiration,
+            "address1": values.billing_address1,
+            "address2": values.billing_address2,
+            "city": values.billing_city,
+            "state": values.billing_state,
+            "zipcode": values.billing_zip
+        }
+
+        const shipping_addr = {
+            "address1": values.address1,
+            "address2": values.address2,
+            "city": values.city,
+            "state": values.state,
+            "zipcode": values.zip
+        }
+
         const registrationData = {
             "email": values.email,
             "first_name": values.first_name,
             "last_name": values.last_name,
             "phone": values.phone,
             "password": values.password,
-            "reg_code": values.reg_code,
+            "promotions_opt_in": values.promotions,
+            "code": values.reg_code,
+            "payment_card": payment_card,
+            "shipping_address": shipping_addr
         };
 
-        // Convert JSON object to string
-        const jsonData = JSON.stringify(registrationData);
-
-        fetch('/Register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/Register/', registrationData);
+            console.log('Response:', response.data);
+        } catch (error) {
+            console.error('Error:', error.response.data.message);
+        }
     };
 
     return (
@@ -116,17 +120,15 @@ const RegisterScreen = () => {
                         </div>
                         {errors.email && <span className="text-danger">{errors.email}</span>}
                         <div className="form-group">
-                            <div className='first-name'>
-                                <label htmlFor="firstName">First Name</label>
-                                <input type="text" id="firstName" name="firstName" placeholder="John" onChange={handleInput} value={values.first_name}></input>
-                            </div>
-                            {errors.first_name && <span className="text-danger">{errors.first_name}</span>}
-                            <div className='last-name'>
-                                <label htmlFor="lastName">Last Name</label>
-                                <input type="text" id="lastName" name="lastName" placeholder="Smith" onChange={handleInput} value={values.last_name}></input>
-                            </div>
-                            {errors.email && <span className="text-danger">{errors.email}</span>}
+                                <label htmlFor="first_name">First Name</label>
+                                <input type="text" id="first_name" name="first_name" placeholder="John" onChange={handleInput} value={values.first_name}></input>
                         </div>
+                        {errors.first_name && <span className="text-danger">{errors.first_name}</span>}
+                        <div className='form-group'>
+                                <label htmlFor="last_name">Last Name</label>
+                                <input type="text" id="first_name" name="last_name" placeholder="Smith" onChange={handleInput} value={values.last_name}></input>
+                        </div>
+                        {errors.last_name && <span className="text-danger">{errors.last_name}</span>}
                         <button type="button" className="next-btn" onClick={handleNext}>Next</button>
                     </div>
                 )}
@@ -155,11 +157,13 @@ const RegisterScreen = () => {
                     <div className="step step-3 active">
                         <div className="form-group">
                             <label htmlFor="phone">Phone Number</label>
-                            <input type="text" id="phone-number" name="phoneNumber" placeholder='555-5555-5555' onChange={handleInput} value={values.phone}></input>
+                            <input type="text" id="phone" name="phone" placeholder='555-5555-5555' onChange={handleInput} value={values.phone}></input>
                         </div>
+                        {errors.phone && <span className="text-danger">{errors.phone}</span>}
                         <div className="form-group">
                             <label htmlFor="street">Address (optional)</label>
-                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' onChange={handleInput} value={values.address}></input>
+                            <input type="text" id="address1" name="address1" placeholder='Address 1' onChange={handleInput} value={values.address1}></input>
+                            <input type="text" id="address2" name="address2" placeholder='Address 2' onChange={handleInput} value={values.address2}></input>
                             <input type="text" id="city" name="city" placeholder='Athens' onChange={handleInput} value={values.city}></input>
                             <input type="text" id="state" name="state" placeholder='Georgia' onChange={handleInput} value={values.state}></input>
                             <input type="text" id="zip" name="zip" placeholder='55555' onChange={handleInput} value={values.zip}></input>
@@ -176,7 +180,8 @@ const RegisterScreen = () => {
                             <input type="text" id="expiration" name="expiration" placeholder='expiration date' onChange={handleInput} value={values.card_expiration}></input>
                             <input type="text" id="cvv" name="cvv" placeholder='cvv' onChange={handleInput} value={values.card_cvv}></input>
                             <label htmlFor="street">Billing Address</label>
-                            <input type="text" id="street" name="street" placeholder='555 Movie Avenue' onChange={handleInput} value={values.billing_address}></input>
+                            <input type="text" id="billing_address1" name="billing_address1" placeholder='Address 1' onChange={handleInput} value={values.billing_address1}></input>
+                            <input type="text" id="billing_address2" name="billing_address2" placeholder='Address 2' onChange={handleInput} value={values.billing_address2}></input>
                             <input type="text" id="city" name="city" placeholder='Athens' onChange={handleInput} value={values.billing_city}></input>
                             <input type="text" id="state" name="state" placeholder='Georgia' onChange={handleInput} value={values.billing_state}></input>
                             <input type="text" id="zip" name="zip" placeholder='55555' onChange={handleInput} value={values.billing_zip}></input>
@@ -187,9 +192,11 @@ const RegisterScreen = () => {
                 {currentStep === 5 && (
                     <div className="step step-5 active">
                         <div className="form-group">
-                            <label htmlFor="code" className="header">Code</label>
-                            <input type="text" id="code" name="code" placeholder="Code" onChange={handleInput} value={values.reg_code} ></input>
+                            <label htmlFor="reg_code" className="header">Code</label>
+                            <input type="text" id="reg_code" name="reg_code" placeholder="Code" onChange={handleInput} value={values.reg_code} ></input>
                         </div>
+                        <input type="checkbox" id="promotions" name="promotions" onChange={handleInput} value={values.promotions}></input>
+                        <label htmlFor="promotions">Do you want to receive promotions?</label>
                         <button type="submit" className="submit-btn" onClick={handleSubmit}>Verify</button>
                     </div>
                 )}
@@ -200,7 +207,7 @@ const RegisterScreen = () => {
 
 function Register() {
     return (
-        <div className="Login">
+        <div className="Register">
             <RegisterScreen />
         </div>
     );

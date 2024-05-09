@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import './styles/Home.css';
 import "react-datepicker/dist/react-datepicker.css";
+axios.defaults.withCredentials = true;
 
 /*
 import './assets/images/mpaa_G.png';
@@ -15,16 +16,16 @@ import './assets/images/mpaa_R.png';
 import './assets/images/mpaa_NC-17.png';
 */
 
-const RedirectButton = ({to, children}) => {
-    const navigate = useNavigate();
+const RedirectButton = ({ to, children }) => {
+  const navigate = useNavigate();
 
-    const handleClick = () => {
-	navigate(to);
-    };
+  const handleClick = () => {
+    navigate(to);
+  };
 
-    return (	
-	<button onClick={() => handleClick}>{children}</button>
-    );
+  return (
+    <button onClick={() => handleClick}>{children}</button>
+  );
 };
 
 function createTimeList(movie) {
@@ -40,7 +41,7 @@ function createTimeList(movie) {
 
     // Extract the date in a separate variable
     const date = new Date(showtime.time).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
- 
+
     timeList.push(time);
   });
 
@@ -54,18 +55,18 @@ const Movie = ({ title, rating, mpaaRating, imageUrl, date, times, onClick }) =>
     <div className="movie">
       <img src={imageUrl} alt={title} className="movie-image" onClick={onClick} />
       <div className="movie-details">
-     	  <h3>{mpaaRating}</h3>
-          <h3 className="movie-title">{title}</h3>
+        <h3>{mpaaRating}</h3>
+        <h3 className="movie-title">{title}</h3>
       </div>
       <div className="show-details">
         {date && <h3>Date: {date}</h3>}
-	{times && times.length > 0 && <h3>Show Times:</h3>} 
-	{times && times.length > 0 && (
-	  <ul>
-	    {times.map((time, index) => (
-	      <li key={index}>{time}</li>
-	    ))}
-	  </ul>
+        {times && times.length > 0 && <h3>Show Times:</h3>}
+        {times && times.length > 0 && (
+          <ul>
+            {times.map((time, index) => (
+              <li key={index}>{time}</li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
@@ -95,7 +96,7 @@ const GridView = ({ endpoint, displayMode }) => {
     case 0:
       return (
         <div className="movie-grid">
-       	  {movies.map(movie => (
+          {movies.map(movie => (
             <Movie
               key={movie.id}
               title={movie.title}
@@ -103,97 +104,97 @@ const GridView = ({ endpoint, displayMode }) => {
               imageUrl={movie.trailer_picture}
               onClick={() => console.log(`Clicked on ${movie.title}`)} // Example click handler
             />
-	  ))}
-    	</div>
+          ))}
+        </div>
       );
-		  
+
     case 1:
       return (
         <div className="movie-grid">
-	  {movies.map(movie => (
-	    <Movie
-	      key={movie.id}
-	      title={movie.title}
+          {movies.map(movie => (
+            <Movie
+              key={movie.id}
+              title={movie.title}
               date={new Date(movie.showtime.time).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-	      mpaaRating={movie.mpaa_rating}
-	      imageUrl={movie.trailer_picture}
-	      onClick={() => console.log('Clicked on', movie.title)} // Example click handler
+              mpaaRating={movie.mpaa_rating}
+              imageUrl={movie.trailer_picture}
+              onClick={() => console.log('Clicked on', movie.title)} // Example click handler
             />
-	  ))}
-	</div>
-      ); 
+          ))}
+        </div>
+      );
     case 2:
       const date = new Date(movies[0].showtime.time).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       return (
         <div className="movie-grid">
-	  {movies.map(movie => (
-	    <Movie
-	      key={movie.id}
-	      title={movie.title}
+          {movies.map(movie => (
+            <Movie
+              key={movie.id}
+              title={movie.title}
               date={date}
-	      times={createTimeList(movie)}
-	      mpaaRating={movie.mpaa_rating}
-	      imageUrl={movie.trailer_picture}
-	      onClick={() => console.log('Clicked on', movie.title)} // Example click handler
+              times={createTimeList(movie)}
+              mpaaRating={movie.mpaa_rating}
+              imageUrl={movie.trailer_picture}
+              onClick={() => console.log('Clicked on', movie.title)} // Example click handler
             />
-	  ))}
-	</div>
+          ))}
+        </div>
       );
-    }
+  }
 };
 
 const Home = () => {
-    const [endpoint, setEndpoint] = useState('NowPlaying/');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [category, setCategory] = useState('None');
-    const [queryDate, setQueryDate] = useState('');
-    const [displayMode, setDisplayMode] = useState(false);
+  const [endpoint, setEndpoint] = useState('NowPlaying/');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [category, setCategory] = useState('None');
+  const [queryDate, setQueryDate] = useState('');
+  const [displayMode, setDisplayMode] = useState(false);
 
-    const categories = ['None', 'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller'];
-    const navigateHome = (endpoint_name) => {
-        setEndpoint(endpoint_name);
-	setDisplayMode(0);
-    };
-    const handleSearch = (search_term) => {
-        console.log(`Search for ${search_term}`);
-	setEndpoint(`Movies/?title=${encodeURIComponent(search_term)}`);
-	setDisplayMode(1);
+  const categories = ['None', 'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller'];
+  const navigateHome = (endpoint_name) => {
+    setEndpoint(endpoint_name);
+    setDisplayMode(0);
+  };
+  const handleSearch = (search_term) => {
+    console.log(`Search for ${search_term}`);
+    setEndpoint(`Movies/?title=${encodeURIComponent(search_term)}`);
+    setDisplayMode(1);
 
-    	if (category !== 'None') {
-      	    setEndpoint(endpoint + '&category=' + category)
-    	}
-    	if (queryDate !== '') {
-      	    const formattedDate = format(queryDate, 'yyyy-MM-dd');
-      	    setEndpoint(endpoint + '&date=' + formattedDate);
-      	    setDisplayMode(2);
-    	}
-	setQueryDate('');
-    };
+    if (category !== 'None') {
+      setEndpoint(endpoint + '&category=' + category)
+    }
+    if (queryDate !== '') {
+      const formattedDate = format(queryDate, 'yyyy-MM-dd');
+      setEndpoint(endpoint + '&date=' + formattedDate);
+      setDisplayMode(2);
+    }
+    setQueryDate('');
+  };
 
-    console.log("Home component re-rendered. Endpoint:", endpoint); 
-    return (
-	<div className="home">
-	    <div className="home-navbar">
-            <button className={endpoint === 'NowPlaying/' ? 'active' : ''} onClick={() => navigateHome('NowPlaying/')}>Now Playing</button>
-            <button className={endpoint === 'ComingSoon/' ? 'active' : ''} onClick={() => navigateHome('ComingSoon/')}>Coming Soon</button>
-            <div className="search-bar">
-                <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                    {categories.map((category, index) => (
-                        <option key={index} value={category}>{category}</option>
-                    ))}
-                </select>
-                <DatePicker selected={queryDate} onChange={date => setQueryDate(date)} />
-                <button onClick={() => handleSearch(searchTerm)}>Search</button>
-            </div>
-	    	<div className="utils-bar">
-	    	    <RedirectButton to='/Login'>Login</RedirectButton>
-	        </div>
-	    </div>
-	    <GridView endpoint={endpoint} displayMode={displayMode} />
-	</div>
-    );
+  console.log("Home component re-rendered. Endpoint:", endpoint);
+  return (
+    <div className="home">
+      <div className="home-navbar">
+        <button className={endpoint === 'NowPlaying/' ? 'active' : ''} onClick={() => navigateHome('NowPlaying/')}>Now Playing</button>
+        <button className={endpoint === 'ComingSoon/' ? 'active' : ''} onClick={() => navigateHome('ComingSoon/')}>Coming Soon</button>
+        <div className="search-bar">
+          <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            {categories.map((category, index) => (
+              <option key={index} value={category}>{category}</option>
+            ))}
+          </select>
+          <DatePicker selected={queryDate} onChange={date => setQueryDate(date)} />
+          <button onClick={() => handleSearch(searchTerm)}>Search</button>
+        </div>
+        <div className="utils-bar">
+          <RedirectButton to='/Login'>Login</RedirectButton>
+        </div>
+      </div>
+      <GridView endpoint={endpoint} displayMode={displayMode} />
+    </div>
+  );
 };
-	
+
 
 export default Home;
