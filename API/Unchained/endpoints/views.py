@@ -187,6 +187,43 @@ class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
 
 
+
+class OrderViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Order.objects.all()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        return queryset
+
+
+#Added this view AFTER the final demo. 
+#Took me all of five minutes, so i figured I might as well
+#Adds functionality for all CRUD operations if client is Admin
+#Also adds email notifications when a new promotion is created
+class PromotionViewset(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Promotion.objects.all()
+    serializer_class = PromotionSerializer
+
+    def create(self, request):
+        permission_classes = [permissions.IsAdminUser]
+        code = request.data.get('code')
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+       
+        message = f'New promotion for GoofyMovies! Use code {code} for a discount on your next purchase!'
+        users = get_user_model().objects.filter(promotions=True)
+        for user.email in users:
+            try :
+                send_mail('GoofyMovies: New Promotion', message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+            except Exception as e:
+                print(str(e))
+        return Response(serializer.data, status=201)
+
 @api_view(['GET'])
 def now_playing(request):
     current_date = datetime.now().date() 

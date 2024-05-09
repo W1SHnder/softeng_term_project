@@ -123,10 +123,19 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'booking', 'completed', 'price_total']
+        fields = ['id', 'booking', 'promotion', 'completed', 'price_total']
 
     def get_price_total(self, obj):
         total = 0
         for ticket in obj.booking.tickets:
             total += ticket.price
+        if obj.promotion:
+            total *= (1 - obj.promotion.discount)
         return total
+
+class PromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotion
+        fields = ['id', 'code', 'discount', 'expiration_date']
+
+
