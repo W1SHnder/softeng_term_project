@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import './styles/Home.css';
 import "react-datepicker/dist/react-datepicker.css";
+axios.defaults.withCredentials = true;
 
 /*
 import './assets/images/mpaa_G.png';
