@@ -2,8 +2,8 @@
 ____________________________________________________________________________________
 
 ### Frontend: ./web_ui
-    - `npm install`: builds frontend environment
-    - `npm start`: runs webpack dev server
+- `npm install`: builds frontend environment
+- `npm start`: runs webpack dev server
 
 ### Backend: ./API
 To build the environment:
